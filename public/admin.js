@@ -266,6 +266,8 @@ async function vCompEdit(id) {
     <div class="full"><label>Competition name</label><input id="fTitle" value="${esc(c.title)}" required maxlength="120" placeholder="e.g. TAG Heuer Aquaracer"></div>
     <div><label>Picture</label><div class="imgdrop"><div class="th" id="imgPrev" style="${img(c.image)}">${c.image ? '' : 'No image'}</div><div><input type="file" id="fImg" accept="image/jpeg,image/png,image/webp"><div class="hint">Square images look best (at least 800×800). JPG, PNG or WebP, max 5 MB.</div></div></div><input type="hidden" id="fImgUrl" value="${esc(c.image || '')}"></div>
     <div><label>Description</label><textarea id="fDesc" rows="9" maxlength="5000">${esc(c.description)}</textarea></div>
+    <div class="full win-n"><label>🏆 How many winners?</label><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn ghost sm" id="wnMinus">−</button><input id="fWinN" type="number" min="1" max="50" style="width:90px;text-align:center;font-weight:800"><button type="button" class="btn ghost sm" id="wnPlus">+</button>
+      <input id="fWinSame" placeholder="Same prize for each new winner, e.g. £100 Cash" style="flex:1;min-width:200px"></div><div class="hint">Set the number and the prize list below updates – one line per winner. You can still type a different prize on any line.</div></div>
     <div class="full"><label>Prizes – in the order they're drawn (lowest first, top prize last)</label><div id="prizes"></div>
       <button type="button" class="btn ghost sm" id="addPrize">+ Add another prize</button><div class="hint">One line = one winner. Leave a single line (or empty) for a one-winner competition.${drawn ? ` <b style="color:var(--orange)">${drawn} already drawn – those can't be changed.</b>` : ''}</div></div>
     <div class="full fsec"><h4>🎟️ Tickets &amp; price</h4></div>
@@ -335,6 +337,12 @@ async function vCompEdit(id) {
       <button type="button" class="btn ghost sm" data-pu="${i}" ${i <= drawn ? 'disabled' : ''}>↑</button><button type="button" class="btn ghost sm" data-pd="${i}" ${i < drawn || i === prizes.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="btn ghost sm" data-px="${i}" ${i < drawn || prizes.length === 1 ? 'disabled' : ''}>✕</button></div>`).join('');
   };
   drawPrizes();
+  const syncN = () => { $('#fWinN').value = prizes.length; };
+  const setN = n => { n = Math.max(Math.max(1, drawn), Math.min(50, n | 0)); const fill = $('#fWinSame').value.trim() || prizes[prizes.length - 1] || '';
+    while (prizes.length < n) prizes.splice(prizes.length - 1 < drawn ? prizes.length : prizes.length - 1, 0, fill);
+    while (prizes.length > n) prizes.splice(Math.max(drawn, prizes.length - 2), 1); if (fill) prizes.forEach((p, i) => { if (!p.trim() && i >= drawn) prizes[i] = fill; }); drawPrizes(); };
+  $('#fWinN').onchange = e => setN(+e.target.value); $('#wnPlus').onclick = () => setN(prizes.length + 1); $('#wnMinus').onclick = () => setN(prizes.length - 1);
+  new MutationObserver(syncN).observe($('#prizes'), { childList: true }); syncN();
   $('#prizes').oninput = e => { if (e.target.dataset.pi) prizes[+e.target.dataset.pi] = e.target.value; };
   $('#prizes').onclick = e => { const b = e.target.closest('button'); if (!b) return; const i = +(b.dataset.pu ?? b.dataset.pd ?? b.dataset.px);
     if (b.dataset.pu) [prizes[i - 1], prizes[i]] = [prizes[i], prizes[i - 1]]; if (b.dataset.pd) [prizes[i + 1], prizes[i]] = [prizes[i], prizes[i + 1]]; if (b.dataset.px) prizes.splice(i, 1); drawPrizes(); };

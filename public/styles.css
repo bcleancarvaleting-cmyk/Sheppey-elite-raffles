@@ -2137,3 +2137,11 @@ body.holding{padding-bottom:0!important}
 .stamp.big{font-size:clamp(30px,9vw,54px);border-width:6px;padding:10px 22px 12px}
 .c-img .stamp{font-size:14px;border-width:3px;padding:4px 8px}
 @keyframes stampIn{from{transform:translate(-50%,-50%) rotate(-12deg) scale(2.2);opacity:0}}
+
+/* card tags sit under the picture so they never cover the artwork */
+.ctags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.ct{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:99px;font:800 11px/1 Inter;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff}
+.ct.kent{background:#fff;color:#0a1230;border-color:#fff}
+.ct.app{border-color:rgba(122,162,255,.55);color:#bcd0ff}
+.ct.wn{background:linear-gradient(135deg,#ffd84d,#c8961e);color:#1a1200;border:0}
+@media (max-width:560px){.ct{font-size:9.5px;padding:4px 8px}}

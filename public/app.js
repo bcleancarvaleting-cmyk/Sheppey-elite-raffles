@@ -208,10 +208,10 @@ function card(c) {
   return `<a class="ccard ${game ? 'is-game' : ''}" href="#comp-${c.id}">
     <div class="img" style="${c.status === 'scheduled' ? '' : img(c.image)}">${c.status === 'scheduled' ? soonArt(c) : ''}${stamp(c)}
       ${game ? `<span class="game-tag g-${c.gameMode}">${{ duck: '🦆 Duck Race', race: '🏁 Race', banker: '💼 Elite Banker', hilo: '🃏 Higher or Lower' }[c.gameMode]}</span>` : c.auto ? '<span class="game-tag g-banker">👑 Elite Player</span>' : `<span class="cat ${free ? 'free' : ''}">${esc(free ? 'Free draw' : c.category)}</span>`}
-      ${c.eligibility === 'kent' ? '<span class="kent-tag">Kent only</span>' : ''}${c.appOnly ? '<span class="app-tag">📱 App exclusive</span>' : ''}
       ${(c.bundles || []).length && c.status === 'live' ? `<span class="cat offer">Buy ${c.bundles[0].buy} <em>+${c.bundles[0].free} free</em></span>` : ''}
     </div>
     <div class="body">
+      ${(() => { const t = [c.eligibility === 'kent' ? '<span class="ct kent">📍 Kent only</span>' : '', c.appOnly ? '<span class="ct app">📱 App exclusive</span>' : '', (c.prizes || []).length > 1 && c.status !== 'drawn' ? `<span class="ct wn">🏆 ${c.prizes.length} winners</span>` : ''].join(''); return t ? `<div class="ctags">${t}</div>` : ''; })()}
       ${c.status === 'live' ? iwLine(c.instant, { card: true }) : ''}
       <h3>${esc(c.title)}</h3>
       ${c.endsAt && c.status === 'live' ? cdHTML(c.endsAt) : ''}
