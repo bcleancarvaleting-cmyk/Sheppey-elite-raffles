@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sheppey Elite Raffles</title>
+<!--OG-->
+<meta name="description" content="Sheppey Elite Raffles – cash, watches, tech and treats. Every prize is drawn live when the competition sells out.">
+<meta name="theme-color" content="#050a1c">
+<link rel="icon" href="favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Elite Raffles">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="neon-bg" aria-hidden="true"><i class="nb-glow b"></i><i class="nb-glow r"></i><i class="nb-beam a"></i><i class="nb-beam b2"></i><i class="nb-beam c"></i><div class="nb-grid"></div><div class="nb-dots"><i style="--x:0%;--d:8s;--l:-0s;--c:#3f78ff"></i><i style="--x:37%;--d:15s;--l:-3s;--c:#ff1f3d"></i><i style="--x:74%;--d:12s;--l:-6s;--c:#3f78ff"></i><i style="--x:11%;--d:9s;--l:-9s;--c:#ff1f3d"></i><i style="--x:48%;--d:16s;--l:-1s;--c:#3f78ff"></i><i style="--x:85%;--d:13s;--l:-4s;--c:#ff1f3d"></i><i style="--x:22%;--d:10s;--l:-7s;--c:#3f78ff"></i><i style="--x:59%;--d:17s;--l:-10s;--c:#ff1f3d"></i><i style="--x:96%;--d:14s;--l:-2s;--c:#3f78ff"></i><i style="--x:33%;--d:11s;--l:-5s;--c:#ff1f3d"></i><i style="--x:70%;--d:8s;--l:-8s;--c:#3f78ff"></i><i style="--x:7%;--d:15s;--l:-0s;--c:#ff1f3d"></i><i style="--x:44%;--d:12s;--l:-3s;--c:#3f78ff"></i><i style="--x:81%;--d:9s;--l:-6s;--c:#ff1f3d"></i><i style="--x:18%;--d:16s;--l:-9s;--c:#3f78ff"></i><i style="--x:55%;--d:13s;--l:-1s;--c:#ff1f3d"></i><i style="--x:92%;--d:10s;--l:-4s;--c:#3f78ff"></i><i style="--x:29%;--d:17s;--l:-7s;--c:#ff1f3d"></i></div></div>
+<header class="topbar">
+  <div class="wrap">
+    <button class="app-back hidden" id="appBack" aria-label="Back">‹</button>
+    <a class="brand" href="#home"><img src="logo-sm.jpg" alt="Sheppey Elite Raffles"><span class="bt">SHEPPEY <i>EL</i><b>ITE</b><br>RAFFLES<small>PLAY • WIN • BE ELITE</small></span></a>
+    <div class="tb-right" id="tbRight"></div>
+  </div>
+</header>
+<nav class="crumbbar"><div class="wrap">
+  <div class="crumbs" id="crumbs"></div>
+  <div class="quicknav" id="quicknav">
+    <a href="#home" data-nav="home">Home</a><a href="#competitions" data-nav="competitions">Competitions</a><a href="#free" data-nav="free">Free draws</a><a href="#how" data-nav="how">How it works</a><a href="#winners" data-nav="winners">Winners</a><a href="#games" data-nav="games">Live games</a><a href="#leaderboard" data-nav="leaderboard">Leaderboard</a><a href="#charity" data-nav="charity">Charity</a>
+  </div>
+</div></nav>
+
+<div class="live-banner hidden" id="liveBanner"></div>
+<main id="view"></main>
+
+<footer class="site"><div class="wrap fgrid">
+  <div><img src="logo-sm.jpg" alt="" style="width:64px;border-radius:50%"><p id="fTerms" style="margin-top:10px"></p></div>
+  <div><h4>Explore</h4><a href="#competitions">Live competitions</a><a href="#free">Free draws</a><a href="#winners">Winners</a><a href="#charity">Charity donations</a><a href="#results">Draw results</a><a href="#how">How it works</a><a href="#postal" class="only-postal">Free postal entry</a></div>
+  <div><h4>Help &amp; trust</h4><a href="#faq">FAQ</a><a href="#contact">Contact us</a><a href="#protection">Player protection</a><a href="#protection">Provably fair draws</a><a href="#complaints">Complaints</a><a href="#account-safe">Safe play limits</a></div>
+  <div><h4>Account</h4><a href="#account">My account</a><a href="#account-tickets">My tickets</a><a href="#account-wins">My wins</a><a href="#terms">Terms &amp; conditions</a><a href="#privacy">Privacy policy</a><span id="fContact"></span><p>© <span id="yr"></span> Sheppey Elite Raffles</p></div>
+</div></footer>
+
+<nav class="botnav" id="botnav" aria-label="App navigation">
+  <a href="#competitions" data-bn="comps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 0 2-2V5h14v2a2 2 0 0 0 0 4v2a2 2 0 0 0 0 4v2H5v-2a2 2 0 0 0 0-4V9z"/><path d="M12 5v14" stroke-dasharray="2 2"/></svg><span>Comps</span></a>
+  <a href="#home" data-bn="home" class="bn-home" aria-label="Home"><span class="bn-ring"><img src="logo-sm.jpg" alt=""></span></a>
+  <a href="#account" data-bn="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Account</span></a>
+</nav>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="basket" aria-label="Basket"></aside>
+<aside class="drawer" id="menu" aria-label="Menu"></aside>
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<div class="toast" id="toast"></div>
+<div class="pop" id="pop" aria-live="polite"></div>
+<button class="chat-fab" id="chatFab" aria-label="Open chat">💬<span class="live-dot hidden" id="liveDot">LIVE</span></button>
+<aside class="chat" id="chat" aria-label="Community chat">
+  <header><div class="chat-tabs"><button data-room="community" class="on">Community</button><button data-room="live">🔴 Live draw</button></div><button class="x" id="chatX">×</button></header>
+  <div class="chat-live hidden" id="chatLive"></div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <form class="chat-form" id="chatForm"><input id="chatIn" maxlength="300" placeholder="Say something…" autocomplete="off"><button class="btn sm">Send</button></form>
+</aside>
+
+<script src="towns.js"></script>
+<script src="wheel.js"></script>
+<script src="games.js"></script>
+<script src="kentmap.js"></script>
+<script src="igames.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

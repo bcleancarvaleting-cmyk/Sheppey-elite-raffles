@@ -1,0 +1,9 @@
+# live data and secrets – never commit these
+data/
+*.key
+.env
+# build output
+demo/dist/
+node_modules/
+*.log
+demo/
