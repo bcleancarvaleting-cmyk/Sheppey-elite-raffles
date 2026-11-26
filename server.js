@@ -400,7 +400,10 @@ async function handle(req, res) {
 bootstrapAdmin().then(() => {
   setInterval(() => { try { if (app.housekeeping(db)) save(); backup(); } catch (e) { console.error(e); } }, 60e3);
   backup();
-  http.createServer((req, res) => {
+  const srv = http.createServer((req, res) => {
     handle(req, res).catch(e => { if (e.code !== 413 && e.code !== 400) console.error(e); if (!res.headersSent) json(req, res, e.code || 500, { error: e.code ? e.message : 'Something went wrong.' }); });
   }).listen(PORT, () => console.log(`Sheppey Elite Raffles running on http://localhost:${PORT}  ·  admin: ${ADMIN_PATH}`));
+  // Railway (and most hosts) send SIGTERM when a new deploy replaces this one – stop cleanly so it isn't reported as a crash
+  const stop = sig => { console.log(`${sig} received – saving and shutting down cleanly.`); try { save(); } catch (e) { console.error(e); } srv.close(() => process.exit(0)); setTimeout(() => process.exit(0), 4000).unref(); };
+  process.once('SIGTERM', () => stop('SIGTERM')); process.once('SIGINT', () => stop('SIGINT'));
 });
