@@ -53,7 +53,7 @@ function renderLogin(need2fa, keep) {
 }
 
 // ================= SHELL =================
-const NAV = [['dashboard', '📊', 'Dashboard'], ['orders', '🧾', 'Orders'], ['comps', '🎟️', 'Competitions'], ['draws', '🎡', 'Draws'], ['customers', '👥', 'Customers'], ['payouts', '💷', 'Payouts & ID'], ['board', '🏅', 'Leaderboard & levels'], ['app', '📱', 'App & alerts'], ['promos', '🏷️', 'Promo codes'], ['games', '🎮', 'Game Centre'], ['jackpot', '💰', 'Jackpot'], ['hold', '🚧', 'Launch / maintenance'], ['donations', '❤️', 'Charity'], ['chat', '💬', 'Chat'], ['inbox', '📨', 'Messages & complaints'], ['emails', '✉️', 'Emails'], ['site-settings', '⚙️', 'Settings'], ['security', '🔒', 'Security & log']];
+const NAV = [['dashboard', '📊', 'Dashboard'], ['orders', '🧾', 'Orders'], ['comps', '🎟️', 'Competitions'], ['draws', '🎡', 'Draws'], ['customers', '👥', 'Customers'], ['payouts', '💷', 'Payouts & ID'], ['board', '🏅', 'Leaderboard & levels'], ['app', '📱', 'App & alerts'], ['promos', '🏷️', 'Promo codes'], ['games', '🎮', 'Game Centre'], ['jackpot', '💰', 'Jackpot'], ['hold', '🚧', 'Launch / maintenance'], ['social', '🖼️', 'Social images'], ['donations', '❤️', 'Charity'], ['chat', '💬', 'Chat'], ['inbox', '📨', 'Messages & complaints'], ['emails', '✉️', 'Emails'], ['site-settings', '⚙️', 'Settings'], ['security', '🔒', 'Security & log']];
 const NAV_NEED = { games: 'settings', orders: 'orders', payouts: 'payouts', donations: 'money', promos: 'money', emails: 'money', 'site-settings': 'settings' };
 const navOk = k => !NAV_NEED[k] || can(NAV_NEED[k]);
 function shell(active, pending, D) {
@@ -101,6 +101,7 @@ async function route() {
     if (h === 'games') return await vGames();
     if (h === 'jackpot') return await vJackpot();
     if (h === 'hold') return await vHold();
+    if (h === 'social') return vSocial();
     if (h === 'app') return await vApp();
     if ((m = /^app-([a-f0-9]{16})$/.exec(h))) return await vApp(m[1]);
     if (h === 'donations') return await vDonations();
@@ -1102,6 +1103,55 @@ async function vHold() {
     if (s.holdOn && !on && !confirm(`Open the site now?${d.waiting ? ` ${d.waiting} people will be notified.` : ''}`)) return;
     try { await api('/api/admin/settings', { holdOn: on, holdMode: $('#hMode').value, holdTitle: $('#hTitle').value.trim(), holdText: $('#hText').value.trim(), holdAt: $('#hAt').value ? new Date($('#hAt').value).toISOString() : '', holdAuto: $('#hAuto').checked });
       toast(on ? 'Holding page is on – the site is closed to customers' : 'Saved – the site is open'); vHold(); } catch (e) { toast(e.message); } };
+}
+// ---------- SOCIAL IMAGES: branded prize graphics for the site and social media ----------
+function vSocial() {
+  const P = { c500: ['£500', 'CASH', 'cash'], c1k: ['£1,000', 'CASH', 'cash'], c2k: ['£2,000', 'CASH', 'cash'], duck: ['£25', 'CREDIT', 'duck'] };
+  const SZ = { sq: [1080, 1080, 'Square – prize card & Facebook post'], story: [1080, 1920, 'Story – Facebook/Instagram'], wide: [1200, 630, 'Wide – link preview & banner'] };
+  $('#main').innerHTML = `<div class="ph"><h1 class="d">🖼️ Social images</h1></div><p class="muted" style="margin-top:-6px">Branded prize graphics in your colours and logo. Download them for prize cards on the site and for Facebook.</p>
+  <div class="card" style="max-width:980px"><div class="formgrid">
+    <div class="full"><label>Preset</label><div class="row" style="flex-wrap:wrap;gap:6px">${[['c500', '£500 Cash'], ['c1k', '£1,000 Cash'], ['c2k', '£2,000 Cash'], ['duck', '🦆 Duck race credit']].map(([k, l]) => `<button type="button" class="btn ghost sm" data-sp="${k}">${l}</button>`).join('')}</div></div>
+    <div><label>Big text</label><input id="sgA" value="£500"></div><div><label>Under it</label><input id="sgB" value="CASH"></div>
+    <div><label>Top line</label><input id="sgT" value="WIN"></div><div><label>Bottom line</label><input id="sgC" placeholder="e.g. Tickets 49p · Ends Sunday 9pm"></div>
+    <div><label>Picture</label><select id="sgK"><option value="cash">💷 Cash notes</option><option value="duck">🦆 Duck race</option><option value="none">Logo only</option></select></div>
+    <div><label>Size</label><select id="sgS">${Object.entries(SZ).map(([k, v]) => `<option value="${k}">${v[2]} (${v[0]}×${v[1]})</option>`).join('')}</select></div></div>
+    <canvas id="sgCv" style="width:100%;max-width:520px;display:block;margin:14px auto;border-radius:14px"></canvas>
+    <div class="row" style="justify-content:center;gap:8px"><button class="btn" id="sgDl">⬇ Download image</button><button class="btn ghost" id="sgAll">⬇ All 3 sizes</button></div></div>`;
+  const logo = new Image(); logo.src = 'logo.jpg'; logo.onload = () => draw();
+  const fit = (c, t, max, size, font) => { let f = size; do { c.font = `${font} ${f}px "Russo One", Inter, sans-serif`; f -= 4; } while (c.measureText(t).width > max && f > 20); };
+  function note(c, x, y, w, rot) { const h = w * 0.52; c.save(); c.translate(x, y); c.rotate(rot); const g = c.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); g.addColorStop(0, '#5b2a86'); g.addColorStop(0.5, '#8a4fc0'); g.addColorStop(1, '#4a1f70');
+    c.fillStyle = g; c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 24; c.beginPath(); c.roundRect(-w / 2, -h / 2, w, h, 10); c.fill(); c.shadowBlur = 0; c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 3; c.strokeRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24);
+    c.fillStyle = 'rgba(255,255,255,.9)'; c.font = `900 ${w * 0.16}px Inter`; c.textAlign = 'left'; c.fillText('£50', -w / 2 + 24, -h / 2 + w * 0.2); c.beginPath(); c.arc(w * 0.22, 0, h * 0.3, 0, 7); c.fillStyle = 'rgba(255,255,255,.18)'; c.fill(); c.restore(); }
+  function render(cv, key) {
+    const [W, H] = SZ[key], c = cv.getContext('2d'); cv.width = W; cv.height = H; const u = Math.min(W, H) / 1080;
+    const bg = c.createRadialGradient(W / 2, H * 0.4, 50, W / 2, H / 2, Math.max(W, H) * 0.8); bg.addColorStop(0, '#16205a'); bg.addColorStop(1, '#050816'); c.fillStyle = bg; c.fillRect(0, 0, W, H);
+    [[0, H, '#1f5bff'], [W, H, '#ff1f3d'], [W / 2, 0, '#1f5bff']].forEach(([x, y, col]) => { const g = c.createRadialGradient(x, y, 0, x, y, Math.max(W, H) * 0.6); g.addColorStop(0, col + '66'); g.addColorStop(1, col + '00'); c.fillStyle = g; c.fillRect(0, 0, W, H); });
+    c.save(); c.translate(W / 2, H * 0.47); c.globalAlpha = 0.09; for (let k = 0; k < 24; k++) { c.rotate(Math.PI / 12); c.fillStyle = '#ffd84d'; c.beginPath(); c.moveTo(0, 0); c.lineTo(-40 * u, -Math.max(W, H)); c.lineTo(40 * u, -Math.max(W, H)); c.fill(); } c.restore();
+    const g2 = c.createLinearGradient(0, 0, W, 0); g2.addColorStop(0, '#1f5bff'); g2.addColorStop(1, '#ff1f3d'); c.strokeStyle = g2; c.lineWidth = 14 * u; c.beginPath(); c.roundRect(14 * u, 14 * u, W - 28 * u, H - 28 * u, 40 * u); c.stroke();
+    // fixed layout per size so nothing ever overlaps: [y, font size] for each line
+    const LY = { sq: { lg: [540, 140, 210], top: [318, 54], big: [458, 215], sub: [628, 104], pic: [790, 0.78], pill: [948, 40], dom: [540, 1036, 30] },
+      story: { lg: [540, 250, 300], top: [500, 70], big: [680, 260], sub: [880, 130], pic: [1200, 1], pill: [1600, 48], dom: [540, 1840, 36] },
+      wide: { lg: [205, 315, 300], top: [120, 44], big: [262, 170], sub: [400, 86], pic: null, pill: [520, 34], dom: [205, 510, 24] } }[key];
+    const wide = key === 'wide', cx = wide ? 790 : W / 2, [lx, ly, L] = LY.lg;
+    if (logo.complete && logo.naturalWidth) { c.save(); c.shadowColor = '#1f5bff'; c.shadowBlur = 40; c.beginPath(); c.arc(lx, ly, L / 2, 0, 7); c.clip(); c.drawImage(logo, lx - L / 2, ly - L / 2, L, L); c.restore(); }
+    c.textAlign = 'center'; c.textBaseline = 'middle'; const maxW = wide ? 700 : W * 0.86, kind = $('#sgK').value;
+    const top = $('#sgT').value.trim(); if (top) { fit(c, top.toUpperCase(), maxW, LY.top[1], '400'); c.fillStyle = '#fff'; c.fillText(top.toUpperCase(), cx, LY.top[0]); }
+    const A = $('#sgA').value.trim() || '£500', y = LY.big[0]; fit(c, A, maxW, LY.big[1], '400');
+    const gold = c.createLinearGradient(0, y - LY.big[1] / 2, 0, y + LY.big[1] / 2); gold.addColorStop(0, '#fff8d6'); gold.addColorStop(0.45, '#ffd84d'); gold.addColorStop(0.55, '#c8961e'); gold.addColorStop(1, '#fff0b8');
+    c.lineWidth = LY.big[1] / 22; c.strokeStyle = '#3a2600'; c.strokeText(A, cx, y + 6); c.fillStyle = gold; c.shadowColor = 'rgba(255,216,77,.6)'; c.shadowBlur = 40; c.fillText(A, cx, y); c.shadowBlur = 0;
+    const B = $('#sgB').value.trim(); if (B) { fit(c, B.toUpperCase(), maxW, LY.sub[1], '400'); c.fillStyle = '#fff'; c.shadowColor = '#ff1f3d'; c.shadowBlur = 30; c.fillText(B.toUpperCase(), cx, LY.sub[0]); c.shadowBlur = 0; }
+    if (LY.pic && kind !== 'none') { const [py, k] = LY.pic;
+      if (kind === 'cash') { note(c, W / 2 - 165 * k, py + 10 * k, 330 * k, -0.25); note(c, W / 2 + 165 * k, py + 10 * k, 330 * k, 0.22); note(c, W / 2, py - 10 * k, 350 * k, -0.02); }
+      else { c.fillStyle = 'rgba(80,170,255,.3)'; c.beginPath(); c.ellipse(W / 2, py + 85 * k, 300 * k, 34 * k, 0, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = `${200 * k}px serif`; c.fillText('🦆', W / 2, py); } }
+    const C = $('#sgC').value.trim(); if (C) { const [fy, fs] = LY.pill; c.font = `800 ${fs}px Inter`; const w = Math.min(maxW + 40, c.measureText(C).width + 70); c.fillStyle = 'rgba(0,0,0,.6)'; c.beginPath(); c.roundRect(cx - w / 2, fy - fs, w, fs * 2, fs); c.fill(); c.strokeStyle = '#ffd84d'; c.lineWidth = 3; c.stroke(); c.fillStyle = '#ffd84d'; c.fillText(C, cx, fy); }
+    const [dx, dy, ds] = LY.dom; c.fillStyle = 'rgba(255,255,255,.8)'; c.font = `700 ${ds}px Inter`; c.fillText(location.hostname.replace(/^www\./, ''), dx, dy);
+  }
+  const draw = () => render($('#sgCv'), $('#sgS').value);
+  const save = key => { const cv = document.createElement('canvas'); render(cv, key); const a = document.createElement('a'); a.download = `${($('#sgA').value + '-' + $('#sgB').value).replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-${key}.png`; a.href = cv.toDataURL('image/png'); a.click(); };
+  $$('[data-sp]').forEach(b => b.onclick = () => { const [A, B, K] = P[b.dataset.sp]; $('#sgA').value = A; $('#sgB').value = B; $('#sgK').value = K; $('#sgT').value = K === 'duck' ? 'WIN IN THE DUCK RACE' : 'WIN'; draw(); });
+  $$('#sgA,#sgB,#sgT,#sgC').forEach(i => i.addEventListener('input', draw)); $$('#sgK,#sgS').forEach(i => i.addEventListener('change', draw));
+  $('#sgDl').onclick = () => save($('#sgS').value); $('#sgAll').onclick = () => Object.keys(SZ).forEach((k, i) => setTimeout(() => save(k), i * 400));
+  document.fonts && document.fonts.ready.then(draw); draw();
 }
 })();
 
