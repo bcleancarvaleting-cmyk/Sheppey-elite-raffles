@@ -272,7 +272,7 @@ function baseHeaders(req) {
   return h;
 }
 const isHttps = req => TRUST_PROXY ? req.headers['x-forwarded-proto'] === 'https' : !!req.socket.encrypted;
-const clientIp = req => TRUST_PROXY ? String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress : req.socket.remoteAddress;
+const clientIp = req => process.env.BEHIND_CLOUDFLARE === '1' && req.headers['cf-connecting-ip'] ? String(req.headers['cf-connecting-ip']).trim() : TRUST_PROXY ? String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress : req.socket.remoteAddress;
 // compression: pages, code and API answers are sent squeezed (typically 70–85% smaller) to any browser that accepts it
 const enc = req => { const a = String(req.headers['accept-encoding'] || ''); return /\bbr\b/.test(a) ? 'br' : /\bgzip\b/.test(a) ? 'gzip' : null; };
 const squeeze = (buf, how, fast) => how === 'br' ? zlib.brotliCompressSync(buf, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: fast ? 4 : 11, [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf.length } }) : zlib.gzipSync(buf, { level: fast ? 5 : 9 });
