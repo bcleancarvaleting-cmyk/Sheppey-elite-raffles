@@ -223,9 +223,17 @@ function backup() {
 load();
 
 async function bootstrapAdmin() {
-  if (db.admins.length) return;
   const email = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const pw = String(process.env.ADMIN_PASSWORD || '');
+  // Locked out? Set ADMIN_RESET=1 with ADMIN_EMAIL + ADMIN_PASSWORD, deploy once, log in, then remove all three.
+  if (process.env.ADMIN_RESET === '1' && email && pw.length >= 12) {
+    let a = db.admins.find(x => x.email === email);
+    if (!a) { a = { id: crypto.randomBytes(8).toString('hex'), email, name: 'Owner', createdAt: new Date().toISOString() }; db.admins.unshift(a); }
+    Object.assign(a, { pass: await helpers.hash(pw), totp: null, failed: 0, lockedUntil: null, mustChange: false }); delete a.role;
+    db.adminSessions = (db.adminSessions || []).filter(x => x.adminId !== a.id); save();
+    console.log(`Admin password reset for ${email} (2FA cleared). Remove ADMIN_RESET and ADMIN_PASSWORD now.`); return;
+  }
+  if (db.admins.length) return;
   if (!email || pw.length < 12) {
     console.warn('No admin account yet. Start once with ADMIN_EMAIL and ADMIN_PASSWORD (12+ characters) to create it.');
     return;
