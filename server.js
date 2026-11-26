@@ -306,7 +306,7 @@ function serveFile(req, res, base, rel, extra = {}) {
   fs.stat(file, (e, st) => {
     if (e || !st.isFile()) return json(req, res, 404, { error: 'Not found' });
     const ext = path.extname(file).toLowerCase(), etag = `"${st.size.toString(36)}-${Math.floor(st.mtimeMs).toString(36)}"`;
-    const cache = ext === '.html' ? 'no-cache' : 'public, max-age=3600, stale-while-revalidate=86400';
+    const cache = ['.html', '.js', '.css', '.webmanifest'].includes(ext) ? 'no-cache' : 'public, max-age=3600, stale-while-revalidate=86400';
     const h = { ...baseHeaders(req), 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': cache, ETag: etag, Vary: 'Accept-Encoding', ...extra };
     if (req.headers['if-none-match'] === etag) { res.writeHead(304, h); return res.end(); }  // phone already has this exact file
     const how = /\.(js|css|html|svg|json)$/.test(ext) && st.size > 1024 ? enc(req) : null;

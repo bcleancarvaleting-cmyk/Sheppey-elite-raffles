@@ -1,5 +1,5 @@
 /* Sheppey Elite Raffles – service worker: offline shell + push notifications */
-const CACHE = 'ser-v7';
+const CACHE = 'ser-v8';
 const SHELL = ['/', '/index.html', '/styles.css', '/app.js', '/games.js', '/kentmap.js', '/igames.js', '/wheel.js', '/towns.js', '/logo-sm.jpg', '/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
