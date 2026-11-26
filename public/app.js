@@ -206,7 +206,7 @@ function iwSection(I) {
 function card(c) {
   const free = c.type === 'free', game = c.gameMode && c.gameMode !== 'standard';
   return `<a class="ccard ${game ? 'is-game' : ''}" href="#comp-${c.id}">
-    <div class="img" style="${c.status === 'scheduled' ? '' : img(c.image)}">${c.status === 'scheduled' ? soonArt(c) : ''}
+    <div class="img" style="${c.status === 'scheduled' ? '' : img(c.image)}">${c.status === 'scheduled' ? soonArt(c) : ''}${stamp(c)}
       ${game ? `<span class="game-tag g-${c.gameMode}">${{ duck: '🦆 Duck Race', race: '🏁 Race', banker: '💼 Elite Banker', hilo: '🃏 Higher or Lower' }[c.gameMode]}</span>` : c.auto ? '<span class="game-tag g-banker">👑 Elite Player</span>' : `<span class="cat ${free ? 'free' : ''}">${esc(free ? 'Free draw' : c.category)}</span>`}
       ${c.eligibility === 'kent' ? '<span class="kent-tag">Kent only</span>' : ''}${c.appOnly ? '<span class="app-tag">📱 App exclusive</span>' : ''}
       ${(c.bundles || []).length && c.status === 'live' ? `<span class="cat offer">Buy ${c.bundles[0].buy} <em>+${c.bundles[0].free} free</em></span>` : ''}
@@ -504,7 +504,7 @@ function initCarousel(list) {
   if (!list.length) { $('#carousel').innerHTML = '<div class="empty" style="margin:0 18px">New prizes coming soon.</div>'; return; }
   track.innerHTML = list.map((c, i) => `<a class="c-slide" data-i="${i}" href="#comp-${c.id}" aria-label="${esc(c.title)}">
       <span class="c-ring"></span>
-      <span class="c-img" style="${img(c.image)}">${c.type === 'free' ? '<span class="c-tag">Free draw</span>' : c.featured ? '<span class="c-tag">Featured</span>' : ''}</span></a>`).join('');
+      <span class="c-img" style="${img(c.image)}">${stamp(c)}${c.type === 'free' ? '<span class="c-tag">Free draw</span>' : c.featured ? '<span class="c-tag">Featured</span>' : ''}</span></a>`).join('');
   $('#cDots').innerHTML = list.length > 1 && list.length <= 7 ? list.map((_, i) => `<button data-dot="${i}" aria-label="Prize ${i + 1}"></button>`).join('') : list.length > 7 ? '<div class="c-count" id="cCount"></div>' : '';
   $$('.c-arrow').forEach(b => b.classList.toggle('hidden', list.length < 2));
   layoutCarousel();
@@ -626,7 +626,7 @@ async function viewComp(id) {
     ${d.instant && iwLine(d.instant.prizes) ? `<div class="iw-top">${iwLine(d.instant.prizes, { btn: true })}</div>` : ''}
     <h1 class="d cp-title chrome">${esc(c.title)}</h1>
     <div class="cp-grid">
-      <div><div class="cp-img" style="${c.status === 'scheduled' ? '' : img(c.image)}">${c.status === 'scheduled' ? soonArt(c, true) : ''}${['live', 'scheduled'].includes(c.status) ? `<button class="cp-fav ${(me?.favs || []).includes(c.id) ? 'on' : ''}" data-fav="${c.id}" aria-label="Save to favourites">${(me?.favs || []).includes(c.id) ? '❤️' : '🤍'}<span>${(me?.favs || []).includes(c.id) ? 'Saved' : 'Save'}</span></button>` : ''}</div><div class="c-draw cp-community">Supporting our local community, one prize at a time</div>
+      <div><div class="cp-img" style="${c.status === 'scheduled' ? '' : img(c.image)}">${c.status === 'scheduled' ? soonArt(c, true) : ''}${stamp(c, true)}${['live', 'scheduled'].includes(c.status) ? `<button class="cp-fav ${(me?.favs || []).includes(c.id) ? 'on' : ''}" data-fav="${c.id}" aria-label="Save to favourites">${(me?.favs || []).includes(c.id) ? '❤️' : '🤍'}<span>${(me?.favs || []).includes(c.id) ? 'Saved' : 'Save'}</span></button>` : ''}</div><div class="c-draw cp-community">Supporting our local community, one prize at a time</div>
 </div>
       <div>
         <div class="panel">
@@ -2074,5 +2074,8 @@ function renderHold() {
   // check every minute whether we've opened again
   setTimeout(async function chk() { try { const s2 = await api('/api/site'); if (!s2.hold) return location.reload(); } catch { } if (holdActive()) setTimeout(chk, 60000); }, 60000);
 }
+// SOLD OUT / WINNER DRAWN stamp over a prize's picture
+function stamp(c, big) { const t = c.status === 'drawn' ? ['WINNER', 'DRAWN', 'won'] : ['soldout', 'ended', 'drawing'].includes(c.status) ? ['SOLD', 'OUT', 'so'] : null;
+  return t ? `<span class="stamp ${t[2]} ${big ? 'big' : ''}" aria-label="${t[0]} ${t[1]}"><b>${t[0]}</b><b>${t[1]}</b></span>` : ''; }
 })();
 

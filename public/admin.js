@@ -1114,7 +1114,7 @@ function vSocial() {
     <div><label>Big text</label><input id="sgA" value="£500"></div><div><label>Under it</label><input id="sgB" value="CASH"></div>
     <div><label>Top line</label><input id="sgT" value="WIN"></div><div><label>Bottom line</label><input id="sgC" placeholder="e.g. Tickets 49p · Ends Sunday 9pm"></div>
     <div><label>Picture</label><select id="sgK"><option value="cash">💷 Cash notes</option><option value="duck">🦆 Duck race</option><option value="none">Logo only</option></select></div>
-    <div><label>Size</label><select id="sgS">${Object.entries(SZ).map(([k, v]) => `<option value="${k}">${v[2]} (${v[0]}×${v[1]})</option>`).join('')}</select></div></div>
+    <div><label class="switch"><input type="checkbox" id="sgDw" checked> “Drawn when sold out” sash</label></div><div><label>Size</label><select id="sgS">${Object.entries(SZ).map(([k, v]) => `<option value="${k}">${v[2]} (${v[0]}×${v[1]})</option>`).join('')}</select></div></div>
     <canvas id="sgCv" style="width:100%;max-width:520px;display:block;margin:14px auto;border-radius:14px"></canvas>
     <div class="row" style="justify-content:center;gap:8px"><button class="btn" id="sgDl">⬇ Download image</button><button class="btn ghost" id="sgAll">⬇ All 3 sizes</button></div></div>`;
   const logo = new Image(); logo.src = 'logo.jpg'; logo.onload = () => draw();
@@ -1144,12 +1144,15 @@ function vSocial() {
       if (kind === 'cash') { note(c, W / 2 - 165 * k, py + 10 * k, 330 * k, -0.25); note(c, W / 2 + 165 * k, py + 10 * k, 330 * k, 0.22); note(c, W / 2, py - 10 * k, 350 * k, -0.02); }
       else { c.fillStyle = 'rgba(80,170,255,.3)'; c.beginPath(); c.ellipse(W / 2, py + 85 * k, 300 * k, 34 * k, 0, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = `${200 * k}px serif`; c.fillText('🦆', W / 2, py); } }
     const C = $('#sgC').value.trim(); if (C) { const [fy, fs] = LY.pill; c.font = `800 ${fs}px Inter`; const w = Math.min(maxW + 40, c.measureText(C).width + 70); c.fillStyle = 'rgba(0,0,0,.6)'; c.beginPath(); c.roundRect(cx - w / 2, fy - fs, w, fs * 2, fs); c.fill(); c.strokeStyle = '#ffd84d'; c.lineWidth = 3; c.stroke(); c.fillStyle = '#ffd84d'; c.fillText(C, cx, fy); }
+    if ($('#sgDw').checked) { const sw = key === 'wide' ? 300 : 400, th = key === 'wide' ? 46 : 62; c.save(); c.translate(W, 0); c.rotate(Math.PI / 4); c.translate(0, sw * 0.62);
+      const sg = c.createLinearGradient(-sw, 0, sw, 0); sg.addColorStop(0, '#b3001e'); sg.addColorStop(0.5, '#ff1f3d'); sg.addColorStop(1, '#b3001e'); c.fillStyle = sg; c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 18; c.fillRect(-sw, -th / 2, sw * 2, th); c.shadowBlur = 0;
+      c.strokeStyle = '#ffd84d'; c.lineWidth = 3; c.strokeRect(-sw, -th / 2 + 5, sw * 2, th - 10); c.fillStyle = '#fff'; c.font = `900 ${th * 0.4}px Inter`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('DRAWN WHEN SOLD OUT', 0, 1); c.restore(); }
     const [dx, dy, ds] = LY.dom; c.fillStyle = 'rgba(255,255,255,.8)'; c.font = `700 ${ds}px Inter`; c.fillText(location.hostname.replace(/^www\./, ''), dx, dy);
   }
   const draw = () => render($('#sgCv'), $('#sgS').value);
   const save = key => { const cv = document.createElement('canvas'); render(cv, key); const a = document.createElement('a'); a.download = `${($('#sgA').value + '-' + $('#sgB').value).replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-${key}.png`; a.href = cv.toDataURL('image/png'); a.click(); };
   $$('[data-sp]').forEach(b => b.onclick = () => { const [A, B, K] = P[b.dataset.sp]; $('#sgA').value = A; $('#sgB').value = B; $('#sgK').value = K; $('#sgT').value = K === 'duck' ? 'WIN IN THE DUCK RACE' : 'WIN'; draw(); });
-  $$('#sgA,#sgB,#sgT,#sgC').forEach(i => i.addEventListener('input', draw)); $$('#sgK,#sgS').forEach(i => i.addEventListener('change', draw));
+  $$('#sgA,#sgB,#sgT,#sgC').forEach(i => i.addEventListener('input', draw)); $$('#sgK,#sgS,#sgDw').forEach(i => i.addEventListener('change', draw));
   $('#sgDl').onclick = () => save($('#sgS').value); $('#sgAll').onclick = () => Object.keys(SZ).forEach((k, i) => setTimeout(() => save(k), i * 400));
   document.fonts && document.fonts.ready.then(draw); draw();
 }
