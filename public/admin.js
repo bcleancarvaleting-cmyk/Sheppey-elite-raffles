@@ -1113,11 +1113,14 @@ function vSocial() {
     <div class="full"><label>Preset</label><div class="row" style="flex-wrap:wrap;gap:6px">${[['c500', '£500 Cash'], ['c1k', '£1,000 Cash'], ['c2k', '£2,000 Cash'], ['duck', '🦆 Duck race credit']].map(([k, l]) => `<button type="button" class="btn ghost sm" data-sp="${k}">${l}</button>`).join('')}</div></div>
     <div><label>Big text</label><input id="sgA" value="£500"></div><div><label>Under it</label><input id="sgB" value="CASH"></div>
     <div><label>Top line</label><input id="sgT" value="WIN"></div><div><label>Bottom line</label><input id="sgC" placeholder="e.g. Tickets 49p · Ends Sunday 9pm"></div>
-    <div><label>Picture</label><select id="sgK"><option value="cash">💷 Cash notes</option><option value="duck">🦆 Duck race</option><option value="none">Logo only</option></select></div>
+    <div><label>Picture</label><select id="sgK"><option value="cash">💷 Cash notes</option><option value="duck">🦆 Duck race</option><option value="photo">📷 Your photo</option><option value="none">Logo only</option></select></div>
+    <div class="sg-ph" hidden><label>Your photo (e.g. real cash, the prize)</label><input type="file" id="sgF" accept="image/*"></div>
+    <div class="sg-ph" hidden><label>Photo style</label><select id="sgM"><option value="bg">Full background</option><option value="mid">Framed in the middle</option></select></div>
     <div><label class="switch"><input type="checkbox" id="sgDw" checked> “Drawn when sold out” sash</label></div><div><label>Size</label><select id="sgS">${Object.entries(SZ).map(([k, v]) => `<option value="${k}">${v[2]} (${v[0]}×${v[1]})</option>`).join('')}</select></div></div>
     <canvas id="sgCv" style="width:100%;max-width:520px;display:block;margin:14px auto;border-radius:14px"></canvas>
     <div class="row" style="justify-content:center;gap:8px"><button class="btn" id="sgDl">⬇ Download image</button><button class="btn ghost" id="sgAll">⬇ All 3 sizes</button></div></div>`;
-  const logo = new Image(); logo.src = 'logo.jpg'; logo.onload = () => draw();
+  const logo = new Image(); logo.src = 'logo.jpg'; logo.onload = () => draw(); const photo = new Image(); photo.onload = () => draw();
+  const cover = (c, im, x, y, w, h) => { const r = Math.max(w / im.naturalWidth, h / im.naturalHeight), iw = im.naturalWidth * r, ih = im.naturalHeight * r; c.drawImage(im, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih); };
   const fit = (c, t, max, size, font) => { let f = size; do { c.font = `${font} ${f}px "Russo One", Inter, sans-serif`; f -= 4; } while (c.measureText(t).width > max && f > 20); };
   function note(c, x, y, w, rot) { const h = w * 0.52; c.save(); c.translate(x, y); c.rotate(rot); const g = c.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); g.addColorStop(0, '#5b2a86'); g.addColorStop(0.5, '#8a4fc0'); g.addColorStop(1, '#4a1f70');
     c.fillStyle = g; c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 24; c.beginPath(); c.roundRect(-w / 2, -h / 2, w, h, 10); c.fill(); c.shadowBlur = 0; c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 3; c.strokeRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24);
@@ -1127,6 +1130,8 @@ function vSocial() {
     const bg = c.createRadialGradient(W / 2, H * 0.4, 50, W / 2, H / 2, Math.max(W, H) * 0.8); bg.addColorStop(0, '#16205a'); bg.addColorStop(1, '#050816'); c.fillStyle = bg; c.fillRect(0, 0, W, H);
     [[0, H, '#1f5bff'], [W, H, '#ff1f3d'], [W / 2, 0, '#1f5bff']].forEach(([x, y, col]) => { const g = c.createRadialGradient(x, y, 0, x, y, Math.max(W, H) * 0.6); g.addColorStop(0, col + '66'); g.addColorStop(1, col + '00'); c.fillStyle = g; c.fillRect(0, 0, W, H); });
     c.save(); c.translate(W / 2, H * 0.47); c.globalAlpha = 0.09; for (let k = 0; k < 24; k++) { c.rotate(Math.PI / 12); c.fillStyle = '#ffd84d'; c.beginPath(); c.moveTo(0, 0); c.lineTo(-40 * u, -Math.max(W, H)); c.lineTo(40 * u, -Math.max(W, H)); c.fill(); } c.restore();
+    const kind0 = $('#sgK').value, hasPh = kind0 === 'photo' && photo.naturalWidth, bgPh = hasPh && ($('#sgM').value === 'bg' || key === 'wide');
+    if (bgPh) { cover(c, photo, 0, 0, W, H); const sh = c.createLinearGradient(0, 0, 0, H); sh.addColorStop(0, 'rgba(5,8,22,.78)'); sh.addColorStop(0.5, 'rgba(5,8,22,.45)'); sh.addColorStop(1, 'rgba(5,8,22,.85)'); c.fillStyle = sh; c.fillRect(0, 0, W, H); }
     const g2 = c.createLinearGradient(0, 0, W, 0); g2.addColorStop(0, '#1f5bff'); g2.addColorStop(1, '#ff1f3d'); c.strokeStyle = g2; c.lineWidth = 14 * u; c.beginPath(); c.roundRect(14 * u, 14 * u, W - 28 * u, H - 28 * u, 40 * u); c.stroke();
     // fixed layout per size so nothing ever overlaps: [y, font size] for each line
     const LY = { sq: { lg: [540, 140, 210], top: [318, 54], big: [458, 215], sub: [628, 104], pic: [790, 0.78], pill: [948, 40], dom: [540, 1036, 30] },
@@ -1141,7 +1146,9 @@ function vSocial() {
     c.lineWidth = LY.big[1] / 22; c.strokeStyle = '#3a2600'; c.strokeText(A, cx, y + 6); c.fillStyle = gold; c.shadowColor = 'rgba(255,216,77,.6)'; c.shadowBlur = 40; c.fillText(A, cx, y); c.shadowBlur = 0;
     const B = $('#sgB').value.trim(); if (B) { fit(c, B.toUpperCase(), maxW, LY.sub[1], '400'); c.fillStyle = '#fff'; c.shadowColor = '#ff1f3d'; c.shadowBlur = 30; c.fillText(B.toUpperCase(), cx, LY.sub[0]); c.shadowBlur = 0; }
     if (LY.pic && kind !== 'none') { const [py, k] = LY.pic;
-      if (kind === 'cash') { note(c, W / 2 - 165 * k, py + 10 * k, 330 * k, -0.25); note(c, W / 2 + 165 * k, py + 10 * k, 330 * k, 0.22); note(c, W / 2, py - 10 * k, 350 * k, -0.02); }
+      if (kind === 'photo') { if (hasPh && !bgPh) { const pw = 640 * k, phh = 300 * k, x = W / 2 - pw / 2, y0 = py - phh / 2; c.save(); c.shadowColor = 'rgba(0,0,0,.6)'; c.shadowBlur = 30; c.beginPath(); c.roundRect(x, y0, pw, phh, 26 * k); c.fillStyle = '#000'; c.fill(); c.clip(); c.shadowBlur = 0; cover(c, photo, x, y0, pw, phh); c.restore();
+        c.strokeStyle = '#ffd84d'; c.lineWidth = 6 * k; c.beginPath(); c.roundRect(x, y0, pw, phh, 26 * k); c.stroke(); } }
+      else if (kind === 'cash') { note(c, W / 2 - 165 * k, py + 10 * k, 330 * k, -0.25); note(c, W / 2 + 165 * k, py + 10 * k, 330 * k, 0.22); note(c, W / 2, py - 10 * k, 350 * k, -0.02); }
       else { c.fillStyle = 'rgba(80,170,255,.3)'; c.beginPath(); c.ellipse(W / 2, py + 85 * k, 300 * k, 34 * k, 0, 0, 7); c.fill(); c.fillStyle = '#fff'; c.font = `${200 * k}px serif`; c.fillText('🦆', W / 2, py); } }
     const C = $('#sgC').value.trim(); if (C) { const [fy, fs] = LY.pill; c.font = `800 ${fs}px Inter`; const w = Math.min(maxW + 40, c.measureText(C).width + 70); c.fillStyle = 'rgba(0,0,0,.6)'; c.beginPath(); c.roundRect(cx - w / 2, fy - fs, w, fs * 2, fs); c.fill(); c.strokeStyle = '#ffd84d'; c.lineWidth = 3; c.stroke(); c.fillStyle = '#ffd84d'; c.fillText(C, cx, fy); }
     if ($('#sgDw').checked) { const sw = key === 'wide' ? 300 : 400, th = key === 'wide' ? 46 : 62; c.save(); c.translate(W, 0); c.rotate(Math.PI / 4); c.translate(0, sw * 0.62);
@@ -1152,7 +1159,9 @@ function vSocial() {
   const draw = () => render($('#sgCv'), $('#sgS').value);
   const save = key => { const cv = document.createElement('canvas'); render(cv, key); const a = document.createElement('a'); a.download = `${($('#sgA').value + '-' + $('#sgB').value).replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-${key}.png`; a.href = cv.toDataURL('image/png'); a.click(); };
   $$('[data-sp]').forEach(b => b.onclick = () => { const [A, B, K] = P[b.dataset.sp]; $('#sgA').value = A; $('#sgB').value = B; $('#sgK').value = K; $('#sgT').value = K === 'duck' ? 'WIN IN THE DUCK RACE' : 'WIN'; draw(); });
-  $$('#sgA,#sgB,#sgT,#sgC').forEach(i => i.addEventListener('input', draw)); $$('#sgK,#sgS,#sgDw').forEach(i => i.addEventListener('change', draw));
+  $$('#sgA,#sgB,#sgT,#sgC').forEach(i => i.addEventListener('input', draw)); $$('#sgK,#sgS,#sgDw,#sgM').forEach(i => i.addEventListener('change', draw));
+  const phUI = () => $$('.sg-ph').forEach(e => e.hidden = $('#sgK').value !== 'photo'); $('#sgK').addEventListener('change', phUI);
+  $('#sgF').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { photo.src = r.result; }; r.readAsDataURL(f); };
   $('#sgDl').onclick = () => save($('#sgS').value); $('#sgAll').onclick = () => Object.keys(SZ).forEach((k, i) => setTimeout(() => save(k), i * 400));
   document.fonts && document.fonts.ready.then(draw); draw();
 }
