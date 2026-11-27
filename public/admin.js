@@ -484,8 +484,8 @@ async function vDrawStudio(id, keepMethod) {
     };
   }
   if (drawMethod === 'lms') {
-    const show = SERGames.LmsShow($('#lmsHost'), { admin: true, onAction: async act => { $('#drawErr').textContent = ''; const st = await api(`/api/admin/comps/${id}/lms/${act}`, act === 'start' ? { force: early } : {});
-      if (st.phase === 'won') setTimeout(() => { if ($('#lmsHost')) vDrawStudio(id, 'lms'); }, 9000); return st; } });
+    const show = SERGames.LmsShow($('#lmsHost'), { admin: true, onAction: async (act, body) => { $('#drawErr').textContent = ''; const st = await api(`/api/admin/comps/${id}/lms/${act}`, act === 'start' ? { force: early } : (body || {}));
+      if (st.phase === 'won') { const reload = () => { if (!$('#lmsHost')) return; if (show.busy) return setTimeout(reload, 1000); setTimeout(() => $('#lmsHost') && vDrawStudio(id, 'lms'), 2500); }; setTimeout(reload, 3000); } return st; } });
     api(`/api/admin/comps/${id}/lms`).then(st => show.update(st && st.phase ? st : null)).catch(() => show.update(null));
     if (finished && !lmsLive) show.update(null);
   }

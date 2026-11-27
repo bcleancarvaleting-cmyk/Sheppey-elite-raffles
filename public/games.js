@@ -48,11 +48,11 @@ const sndBtn = () => `<button class="gx-snd" type="button" data-gx-snd aria-labe
 document.addEventListener('click', e => { const b = e.target.closest('[data-gx-snd]'); if (!b) return; const on = Sound.toggle(); document.querySelectorAll('[data-gx-snd]').forEach(x => x.textContent = on ? '🔊' : '🔇'); });
 
 // ================= confetti =================
-function confetti(host, n = 140) {
+function confetti(host, n = 140, pal) {
   const cv = document.createElement('canvas'); cv.className = 'gx-confetti'; host.appendChild(cv);
   const r = host.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = r.width * dpr; cv.height = r.height * dpr; const c = cv.getContext('2d'); c.scale(dpr, dpr);
-  const cols = ['#ff1f3d', '#1f5bff', '#ffc400', '#ffffff', '#ff5a6e', '#5b8cff'];
+  const cols = pal || ['#ff1f3d', '#1f5bff', '#ffc400', '#ffffff', '#ff5a6e', '#5b8cff'];
   const ps = Array.from({ length: n }, () => ({ x: r.width / 2 + (Math.random() - 0.5) * r.width * 0.4, y: r.height * 0.45, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 13 - 4, s: 4 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.4, c: cols[(Math.random() * cols.length) | 0] }));
   let f = 0;
   (function step() {
@@ -580,9 +580,8 @@ function LmsShow(el, opts = {}) {
       grid.innerHTML = st.field.map(([t, nm, tw]) => `<div class="lm-chip ${out.has(t) ? 'out' : ''} ${st.winner === t ? 'win' : ''} ${ctx.mine.has(t) ? 'me' : ''}" data-t="${t}" title="${esc(nm)} · ${esc(tw)}"><b>#${t}</b>${size !== 's' ? `<span>${esc(short(nm))}</span>` : ''}</div>`).join('');
       R.querySelector('.lm-prize').innerHTML = `<small>PLAYING FOR</small><b>${esc(st.prize || '')}</b>`;
       R.querySelector('.lm-count b').textContent = st.remaining;
-      const nextK = st.remaining > 12 ? Math.floor(st.remaining / 2) : 1;
       if (st.phase === 'won') { const w = st.field.find(f => f[0] === st.winner) || []; msg.innerHTML = `🏆 <b>#${st.winner} ${esc(w[1] || '')}</b> is the last one standing!`; ctrl.innerHTML = admin ? '<button class="btn lg gold" data-act="start">☠️ Play for the next prize</button>' : ''; stopAuto(); }
-      else { msg.innerHTML = `Round ${st.round + 1}: <b>${nextK === 1 ? 'one name' : nextK + ' names'}</b> to be knocked out`; ctrl.innerHTML = admin ? `<button class="btn lg" data-act="next">${nextK === 1 ? '❌ Knock one out' : `❌ Knock out ${nextK}`}</button><button class="btn ghost" id="lmAuto">${auto ? '⏸ Stop auto-play' : '▶ Auto-play'}</button>` : ''; }
+      else { msg.innerHTML = admin ? `Round ${st.round + 1}: <b>${st.remaining}</b> still standing – remove 1, 5 or 10` : `Round ${st.round + 1}: <b>${st.remaining}</b> still standing…`; ctrl.innerHTML = admin ? `<div class="lm-cuts">${[1, 5, 10].map(n => `<button class="btn lg ${n === 1 ? '' : 'ghost'}" data-act="next" data-n="${n}" data-body='{"n":${n}}' ${st.remaining - 1 < n ? 'disabled' : ''}>❌ ${n === 1 ? "Remove player" : "Remove " + n}</button>`).join('')}</div><button class="btn ghost" id="lmAuto">${auto ? '⏸ Stop auto-play' : '▶ Auto-play'}</button>` : ''; }
       const ab = R.querySelector('#lmAuto'); if (ab) ab.onclick = () => { auto = !auto; ab.textContent = auto ? '⏸ Stop auto-play' : '▶ Auto-play'; if (auto) tickAuto(); else stopAuto(); };
       if (auto && st.phase === 'running') tickAuto();
     },
@@ -593,32 +592,38 @@ function LmsShow(el, opts = {}) {
         const chips = e.tickets.map(t => R.querySelector(`.lm-chip[data-t="${t}"]`)).filter(Boolean);
         R.querySelectorAll('.lm-chip').forEach(c => { if (e.tickets.includes(+c.dataset.t)) c.classList.remove('out'); });
         const cnt = R.querySelector('.lm-count b'), start = e.remaining + e.tickets.length;
+        const who = t => st.field.find(f => f[0] === t) || [t, '', ''];
         if (e.tickets.length === 1) {
           const live = [...R.querySelectorAll('.lm-chip:not(.out)')], target = chips[0];
           let hops = 18 + Math.floor(Math.random() * 6), last = null;
           for (let i = 0; i < hops; i++) { if (last) last.classList.remove('hunt'); last = i === hops - 1 ? target : live[Math.floor(Math.random() * live.length)]; if (last) last.classList.add('hunt'); Sound.tick(); await wait(70 + i * i * 1.1); }
           if (last) last.classList.remove('hunt');
-          const [t, nm, tw] = st.field.find(f => f[0] === e.tickets[0]) || [e.tickets[0], '', ''];
-          ov.innerHTML = `<div class="bk2-dim light"></div><div class="lm-elim"><small>ELIMINATED</small><b>#${t} ${esc(nm)}</b><span>${esc(tw)}</span></div>`; Sound.buzz();
-          target && target.classList.add('out', 'zap'); cnt.textContent = e.remaining; await wait(1700); ov.innerHTML = '';
+          const [t, nm, tw] = who(e.tickets[0]);
+          ov.innerHTML = `<div class="bk2-dim red"></div><div class="lm-elim"><i class="lm-skull">☠</i><small>ELIMINATED</small><b class="lm-et">#${t}</b><b class="lm-en">${esc(nm)}</b>${tw ? `<span>${esc(tw)}</span>` : ''}<em>${e.remaining} still standing</em></div>`; Sound.buzz();
+          R.classList.add('shake'); setTimeout(() => R.classList.remove('shake'), 500);
+          target && target.classList.add('out', 'zap'); cnt.textContent = e.remaining; await wait(2300); ov.innerHTML = '';
         } else {
-          ov.innerHTML = `<div class="lm-round"><b>ROUND ${e.round}</b><span>${e.tickets.length} knocked out!</span></div>`;
-          const step = Math.max(8, Math.min(60, 2600 / chips.length));
-          for (let i = 0; i < chips.length; i++) { chips[i].classList.add('out', 'zap'); cnt.textContent = start - i - 1; if (i % 3 === 0) Sound.tick(); await wait(step); }
-          await wait(900); ov.innerHTML = '';
+          const list = e.tickets.map(who);
+          ov.innerHTML = `<div class="bk2-dim red"></div><div class="lm-multi"><div class="lm-mhead"><i>☠</i><small>ROUND ${e.round}</small><b>${list.length} ELIMINATED</b></div><div class="lm-mlist ${list.length > 6 ? 'two' : ''}"></div><em>${e.remaining} still standing</em></div>`;
+          Sound.buzz(); await wait(500);
+          const box = ov.querySelector('.lm-mlist');
+          for (let i = 0; i < list.length; i++) { const [t, nm, tw] = list[i];
+            box.insertAdjacentHTML('beforeend', `<div class="lm-mrow"><b>#${t}</b><span>${esc(nm)}</span>${tw ? `<small>${esc(tw)}</small>` : ''}</div>`);
+            if (chips[i]) chips[i].classList.add('out', 'zap'); cnt.textContent = start - i - 1; Sound.tick(); await wait(list.length > 6 ? 170 : 300); }
+          await wait(1900); ov.innerHTML = '';
         }
         return;
       }
       if (e.type === 'winner') {
         const chip = R.querySelector(`.lm-chip[data-t="${e.ticket}"]`); if (chip) chip.classList.add('win');
         Sound.drum(); await wait(1500);
-        ov.innerHTML = `<div class="bk2-dim"></div><div class="gx-win lm-winner"><small>🏆 LAST MAN STANDING</small><b>#${e.ticket}</b><span>${esc(e.name)}${e.town ? ' · ' + esc(e.town) : ''}</span><em>wins ${esc(e.prize)}</em></div>`;
-        Sound.fanfare(); confetti(R, 240); await wait(5000); ov.innerHTML = '';
+        ov.innerHTML = `<div class="bk2-dim gold"></div><div class="lm-rays"></div><div class="lm-gold"><i class="lm-crown">👑</i><small>LAST MAN STANDING</small><b class="lm-gt">#${e.ticket}</b><b class="lm-gn">${esc(e.name)}</b>${e.town ? `<span>${esc(e.town)}</span>` : ''}<em>WINS ${esc(e.prize)}</em></div>`;
+        const GOLD = ['#ffd84d', '#ffc400', '#fff2b0', '#c8961e', '#ffffff', '#ffe27a']; Sound.fanfare(); confetti(R, 280, GOLD); setTimeout(() => !ctx.dead() && confetti(R, 220, GOLD), 1200); setTimeout(() => !ctx.dead() && confetti(R, 180), 2600); await wait(6500); ov.innerHTML = '';
       }
     }
   });
   const stopAuto = () => { auto = false; clearTimeout(autoT); };
-  const tickAuto = () => { clearTimeout(autoT); autoT = setTimeout(() => { if (!auto || show.busy) return; const b = el.querySelector('[data-act="next"]'); if (b) b.click(); }, 1500); };
+  const tickAuto = () => { clearTimeout(autoT); autoT = setTimeout(() => { if (!auto || show.busy) return; const left = (el.querySelectorAll('.lm-chip:not(.out)') || []).length, n = left > 20 ? 10 : left > 6 ? 5 : 1; const b = el.querySelector(`[data-act="next"][data-n="${n}"]`) || el.querySelector('[data-act="next"]:not([disabled])'); if (b) b.click(); }, 1500); };
   return show;
 }
 

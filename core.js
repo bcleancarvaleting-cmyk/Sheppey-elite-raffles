@@ -1470,7 +1470,7 @@
           return ok(lmsPublic(c));
         }
         if (!gm || gm.phase !== 'running') return err(400, 'Start a Last Man Standing game first.');
-        const rem = gm.field.length - gm.out, k = rem > 12 ? Math.floor(rem / 2) : 1;
+        const rem = gm.field.length - gm.out, want = Math.floor(Number(b.n)), k = want >= 1 && want <= 1000 ? want : rem > 12 ? Math.floor(rem / 2) : 1;
         const cut = gm.order.slice(gm.out, gm.out + Math.min(k, rem - 1)); gm.out += cut.length; gm.round++;
         const left = gm.field.length - gm.out;
         ev('cut', { round: gm.round, tickets: cut, remaining: left });

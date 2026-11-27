@@ -2145,3 +2145,48 @@ body.holding{padding-bottom:0!important}
 .ct.app{border-color:rgba(122,162,255,.55);color:#bcd0ff}
 .ct.wn{background:linear-gradient(135deg,#ffd84d,#c8961e);color:#1a1200;border:0}
 @media (max-width:560px){.ct{font-size:9.5px;padding:4px 8px}}
+
+.lm-cuts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%}.lm-cuts .btn{flex:1 1 120px}.lm-cuts .btn[disabled]{opacity:.35}
+
+/* ===== Last Man Standing – premium ===== */
+.lm .bk2-badge .bk2-logo span{color:#fff}.lm .bk2-badge .bk2-logo b{background:linear-gradient(180deg,#fff4c2,#ffd84d 45%,#c8961e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lm-b{background:radial-gradient(120% 80% at 50% 0%,rgba(255,31,61,.16),transparent 60%),radial-gradient(100% 70% at 50% 100%,rgba(31,91,255,.18),transparent 60%),linear-gradient(180deg,#0b1230,#060a1d)!important;border:1px solid rgba(255,216,77,.35)!important;box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 20px 60px rgba(0,0,0,.55),0 0 40px rgba(255,196,0,.12)!important}
+.lm-head{padding:12px 14px;border-radius:16px;background:linear-gradient(90deg,rgba(255,216,77,.12),rgba(255,255,255,.02));border:1px solid rgba(255,216,77,.3)}
+.lm-prize small{color:#ffd84d}.lm-prize b{background:linear-gradient(180deg,#fff,#ffe9a0);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px}
+.lm-count{background:radial-gradient(circle,rgba(255,31,61,.35),rgba(255,31,61,.08));border:2px solid #ff1f3d;box-shadow:0 0 22px rgba(255,31,61,.45),inset 0 0 14px rgba(255,31,61,.35)}
+.lm-chip{background:linear-gradient(160deg,#16224f,#0c1434);border:1px solid rgba(255,216,77,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 3px 8px rgba(0,0,0,.35)}
+.lm-chip b{color:#ffe27a}.lm-chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(#1f5bff,#ff1f3d)}
+.lm-chip.out{opacity:.25}.lm-chip.out::before{background:#ff1f3d}
+.lm-chip.hunt{background:linear-gradient(160deg,#3a0a14,#7a0f22);border-color:#ff3d5a;box-shadow:0 0 22px #ff1f3d,0 0 0 2px #ff1f3d}
+.lm-cuts .btn{background:linear-gradient(180deg,#e0213f,#9e0b22)!important;color:#fff!important;border:1px solid #ff6a80!important;box-shadow:0 6px 18px rgba(255,31,61,.35),inset 0 1px 0 rgba(255,255,255,.25);font-weight:900;letter-spacing:.04em}
+.lm-cuts .btn.ghost{background:linear-gradient(180deg,#2a0812,#170510)!important}
+.bk2-dim.red{background:radial-gradient(circle at 50% 45%,rgba(120,0,20,.55),rgba(3,6,18,.9) 70%)}
+.bk2-dim.gold{background:radial-gradient(circle at 50% 45%,rgba(120,80,0,.55),rgba(3,6,18,.92) 70%)}
+.lm-elim,.lm-multi{position:relative;text-align:center;color:#fff;min-width:min(86%,420px);padding:22px 30px 18px;border-radius:24px;border:3px solid #ff1f3d;background:linear-gradient(180deg,#2a0610,#12040b 60%,#0a0310);box-shadow:0 0 0 6px rgba(255,31,61,.15),0 0 60px rgba(255,31,61,.65),inset 0 0 40px rgba(255,31,61,.25);animation:lmSlam .45s cubic-bezier(.2,1.5,.4,1)}
+.lm-elim small,.lm-multi small{display:block;font:900 13px Inter;letter-spacing:.35em;color:#ff4a63}
+.lm-skull,.lm-mhead i{display:block;font-style:normal;font-size:40px;line-height:1;color:#ff4a63;text-shadow:0 0 18px #ff1f3d;margin-bottom:4px}
+.lm-et{display:block;font:400 clamp(44px,12vw,78px)/1 "Russo One",Inter;color:#ff3d5a;text-shadow:0 0 24px rgba(255,31,61,.8);margin:6px 0 2px}
+.lm-en{display:block;font:900 clamp(20px,5.5vw,32px) Inter;text-decoration:line-through;text-decoration-color:#ff1f3d;text-decoration-thickness:3px}
+.lm-elim span,.lm-mrow small{display:block;color:#ffb3bf;font-weight:700}
+.lm-elim em,.lm-multi em{display:inline-block;margin-top:12px;padding:5px 14px;border-radius:99px;background:rgba(255,31,61,.15);border:1px solid rgba(255,31,61,.5);font:800 12px Inter;letter-spacing:.08em;font-style:normal;text-transform:uppercase;color:#ffd1d8}
+.lm-mhead b{display:block;font:400 clamp(24px,7vw,40px) "Russo One",Inter;color:#ff3d5a;text-shadow:0 0 20px rgba(255,31,61,.7)}
+.lm-mlist{display:grid;gap:6px;margin-top:12px;text-align:left}.lm-mlist.two{grid-template-columns:1fr 1fr}
+.lm-mrow{display:flex;align-items:baseline;gap:8px;padding:7px 10px;border-radius:10px;background:rgba(255,31,61,.12);border:1px solid rgba(255,31,61,.4);animation:lmRow .35s cubic-bezier(.2,1.4,.4,1) both}
+.lm-mrow b{font:400 16px "Russo One",Inter;color:#ff6a80;min-width:44px}.lm-mrow span{font-weight:800;text-decoration:line-through;text-decoration-color:#ff1f3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.lm-mrow small{font-size:11px}
+.lm-rays{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg,rgba(255,216,77,.16) 0 8deg,transparent 8deg 20deg);animation:lmSpin 14s linear infinite;-webkit-mask:radial-gradient(circle,#000 20%,transparent 62%);mask:radial-gradient(circle,#000 20%,transparent 62%)}
+.lm-gold{position:relative;text-align:center;min-width:min(86%,440px);padding:24px 34px 22px;border-radius:26px;border:3px solid #ffd84d;background:radial-gradient(circle at 50% 0%,rgba(255,216,77,.35),transparent 60%),linear-gradient(180deg,#2a1d02,#120c01);box-shadow:0 0 0 6px rgba(255,216,77,.18),0 0 80px rgba(255,196,0,.7),inset 0 0 40px rgba(255,196,0,.25);animation:lmSlam .6s cubic-bezier(.2,1.5,.4,1)}
+.lm-crown{display:block;font-style:normal;font-size:52px;line-height:1;filter:drop-shadow(0 0 14px rgba(255,196,0,.9));animation:lmBob 1.6s ease-in-out infinite}
+.lm-gold small{display:block;font:900 13px Inter;letter-spacing:.35em;color:#ffd84d;margin-top:6px}
+.lm-gt{display:block;font:400 clamp(52px,14vw,96px)/1 "Russo One",Inter;margin:8px 0 4px;background:linear-gradient(180deg,#fff8d6,#ffd84d 45%,#c8961e 80%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(255,196,0,.7))}
+.lm-gn{display:block;font:900 clamp(22px,6vw,36px) Inter;color:#fff}
+.lm-gold span{display:block;color:#ffe9a0;font-weight:700}
+.lm-gold em{display:inline-block;margin-top:14px;padding:8px 20px;border-radius:99px;background:linear-gradient(180deg,#ffe27a,#c8961e);color:#2a1c00;font:900 clamp(15px,4vw,20px) Inter;font-style:normal;letter-spacing:.06em;box-shadow:0 6px 20px rgba(255,196,0,.5)}
+@keyframes lmSlam{from{transform:scale(1.8);opacity:0}}@keyframes lmRow{from{transform:translateX(-20px);opacity:0}}@keyframes lmSpin{to{transform:rotate(360deg)}}@keyframes lmBob{50%{transform:translateY(-6px)}}
+.bk2.stream .lm-et{font-size:120px}.bk2.stream .lm-en{font-size:52px}.bk2.stream .lm-gt{font-size:150px}.bk2.stream .lm-gn{font-size:58px}.bk2.stream .lm-gold em{font-size:32px}.bk2.stream .lm-mrow b{font-size:26px}.bk2.stream .lm-mrow span{font-size:22px}.bk2.stream .lm-mhead b{font-size:60px}
+.lm-b .bk2-ctrl{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.lm-cuts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.lm-cuts .btn{padding-left:6px;padding-right:6px;font-size:14px;min-width:0;white-space:nowrap}
+#lmAuto{width:100%}
+.lm-multi .lm-mrow small{letter-spacing:0;font-weight:700;color:#ffb3bf;margin-left:auto;white-space:nowrap}
+.lm-mlist.two .lm-mrow small{display:none}
+.lm-cuts .btn{font-size:clamp(11px,3.2vw,14px);letter-spacing:.02em;padding:14px 4px}
+.lm-cuts{grid-template-columns:1fr 1fr}.lm-cuts .btn:first-child{grid-column:1/-1;font-size:clamp(14px,4vw,17px)}
