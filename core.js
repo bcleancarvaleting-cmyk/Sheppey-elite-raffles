@@ -822,7 +822,7 @@
         const pass = await h.hash(pw);
         if (db.users.some(x => x.email === email || normPhone(x.phone) === normPhone(phone))) return err(409, 'An account with these details already exists – please log in.');
         const u = { id: newId(), referredBy: refBy ? refBy.id : null, first, last, email, phone, address, pass, createdAt: iso(now()), marketing: !!b.marketing, consentAt: iso(now()), verified: true, balance: 0, ledger: [] };
-        db.users.push(u); ensureRef(db, u);
+        if (db.settings.holdOn) u.holdNotify = true; db.users.push(u); ensureRef(db, u);
         if (refBy) { refBy.refJoins = (refBy.refJoins || 0) + 1; pushTo(db, sub => sub.userId === refBy.id, { title: 'Your friend joined! 🎉', body: `${first} signed up with your link – thanks for spreading the word`, url: '/#account-refer' }); }
         emailWelcome(db, u);
         const token = await startUserSession(db, u);
