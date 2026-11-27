@@ -18,6 +18,7 @@ const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 const PRIVATE_DIR = path.join(DATA_DIR, 'private');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const ADMIN_PATH = '/' + String(process.env.ADMIN_PATH || 'admin').replace(/[^a-z0-9-]/gi, '');
+const BUILD = Date.now().toString(36); // changes every deploy, so phones fetch fresh CSS/JS
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 for (const d of [DATA_DIR, UPLOAD_DIR, BACKUP_DIR, PRIVATE_DIR]) fs.mkdirSync(d, { recursive: true, mode: 0o700 });
@@ -337,7 +338,7 @@ function serveIndex(req, res, compId) {
     const tags = `<base href="/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${escA(site)}"><meta property="og:title" content="${escA(title)}"><meta property="og:description" content="${escA(desc)}">
 <meta property="og:image" content="${escA(image)}"><meta property="og:url" content="${escA(url)}"><meta name="twitter:card" content="summary_large_image">${c ? `\n<meta name="ser-comp" content="${c.id}">` : ''}`;
-    const out = html.replace('<!--OG-->', tags).replace(/<title>[^<]*<\/title>/, `<title>${escA(title)}</title>`);
+    const out = html.replace(/(href|src)="([a-z0-9-]+\.(?:css|js))"/g, `$1="$2?v=${BUILD}"`).replace('<!--OG-->', tags).replace(/<title>[^<]*<\/title>/, `<title>${escA(title)}</title>`);
     res.writeHead(200, { ...baseHeaders(req), 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' }); res.end(out);
   });
 }
